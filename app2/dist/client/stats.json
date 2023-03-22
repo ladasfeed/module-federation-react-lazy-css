@@ -1,0 +1,14 @@
+{
+  "assetsByChunkName": {
+    "main": [
+      "main.js"
+    ],
+    "app2": [
+      "remoteEntry.js"
+    ],
+    "uppercase-formatter": [
+      "uppercase-formatter.js",
+      "uppercase-formatter-65e7f1bb196a59735632.css"
+    ]
+  }
+}
