@@ -7,3 +7,6 @@ app1/.DS_Store
 app2/.DS_Store
 app2/src/client/.DS_Store
 app2/dist/.DS_Store
+
+app1/dist
+app2/dist
