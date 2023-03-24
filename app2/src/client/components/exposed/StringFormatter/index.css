@@ -4,3 +4,10 @@
     border: 4px dashed #228b22;
     margin: 20px;
 }
+
+.back {
+    height: 100px;
+    width: 100px;
+    margin: 20px;
+    background-image: url('../../image.jpg');
+}

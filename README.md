@@ -1,19 +1,154 @@
-# React 18 Code Splitting
+## REACT + SSR + MODULE FEDERATION + STYLES CHUNKS COLLECTING + NESTED LAZY MF CHUNKS
 
-This example demonstrates how to use Code Splitting with React 18.
-
-- `app1` This app consumes the `Content` component from `app2` and uses React.lazy to load it.
-- `app2`This app exposes the `Content` component and split it into a separate chunk using `React.lazy`.
-
-The `app2` is used to expose a component called `Content` and a route called `userRoute`.
-
-## Running Demo
+## Running
 
 Run `yarn` to install the dependencies.
 
 Run `yarn start` this will build and start all applications.
 
-Bellow you can see the port mapping:
-
 - [localhost:3000](http://localhost:3000/) (app1)
 - [localhost:3001](http://localhost:3001/) (app2)
+
+## HOST SERVER SIDE
+
+Server side should be modified. Briefly:
+
+```tsx
+// WORKAROUND
+// We have to use Writable to avoid cutting html.
+const writeable = new Writable({
+  write(chunk: any, encoding: any, callback: any) {
+    res.write(chunk, encoding, callback);
+  },
+  final(callback) {
+    callback();
+  },
+});
+
+// Initialize chunk collector
+// It creates cache objects and function collectChunk
+// in order to gain information from react components
+const chunkCollector = initChunkCollector();
+
+const stream = renderToPipeableStream(
+  // pass collectChunk to react
+  // Host app and microfrontends will use that function
+  // in order to collect information about used chunks
+  <App collectChunk={chunkCollector.collectChunk} />,
+  {
+    async onAllReady() {
+      // Fetch stats from different microfrontends;
+      // use collected data from react to get needed chunks from the stats;
+      // generate a ready-to-use string;
+      const cssChunks = await chunkCollector.finish();
+
+      res.statusCode = didError ? 500 : 200;
+      res.setHeader("Content-type", "text/html");
+      res.write(`
+        <html>
+        <head>
+          ${cssChunks}
+        </head>
+        <body>
+        <div id="root">`);
+
+      stream.pipe(writeable).on("finish", () => {
+        res.write(
+          `</div><script async data-chunk="main" src="http://localhost:3000/static/main.js"></script></body></html>`
+        );
+        res.end();
+      });
+    },
+  }
+);
+```
+
+## HOST
+
+Host application is wrapped in ChunkCollectorContext. It is needed to spread access to server side chunkCollector for every component in the application.
+
+```tsx
+// we get collectChunk from the server side!
+const App = ({ collectChunk = () => {} }: any) => {
+  return (
+    <ChunkCollectorContext.Provider value={{ collectChunk }}>
+      // any logic here
+    </ChunkCollectorContext.Provider>
+  );
+};
+```
+
+---
+
+Let's connect a component from remote
+
+```tsx
+const StringFormatter = React.lazy(() => import("app2/StringFormatter"));
+
+const App = ({ collectChunk = () => {} }: any) => {
+  return (
+    <ChunkCollectorContext.Provider value={{ collectChunk }}>
+      <MfLoader
+        component={StringFormatter}
+        componentProps={{ anyPropHere }}
+        mf="app2" // mf name
+        name="StringFormatter" // name of exposed component
+      />
+      ;
+    </ChunkCollectorContext.Provider>
+  );
+};
+```
+
+---
+
+## REMOTE
+
+Let's initialize exposed component on remote
+
+```tsx
+const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
+  return <div className="test"></div>;
+};
+
+// exposedComponent gets a context value and provides it via local Context instance
+export default exposedComponent(StringFormatter);
+```
+
+Easy!
+
+---
+
+Lets upgrade a component above and mount one internal lazy buddy.
+
+```tsx
+// somewhere
+export const LazyLoadedWrapper = MFUtils.lazyWrapper("app2");
+
+// StringFormatter.tsx
+const UppercaseFormatter = React.lazy(
+  () =>
+    import(
+      /* webpackChunkName: "uppercase-formatter" */ "../../modules/UppercaseFormatter"
+    )
+);
+
+const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
+  return (
+    <div className="test">
+      <LazyLoadedWrapper
+        fallback="loading"
+        mf={"app2"}
+        // name should match webpackChunkName, this is only dangerous place
+        name="uppercase-formatter"
+      >
+        <UppercaseFormatter value={content} />
+      </LazyLoadedWrapper>
+    </div>
+  );
+};
+
+export default exposedComponent(StringFormatter);
+```
+
+You can easily connect inner lazy component for every level of nesting without any props drilling, everything is already connected (exposedComponent <--> LazyLoadedWrapper)

@@ -1,10 +1,14 @@
 import React from "react";
-import "./index.css";
+// @ts-ignore
+import RayBanIcon from "./rayBan.svg";
+// @ts-ignore
+import s from "./index.scss";
 
 export const Card = () => {
   return (
-    <div className="card-container">
+    <div className={s.container}>
       This is a simple UI component from remote app
+      <RayBanIcon />
     </div>
   );
 };

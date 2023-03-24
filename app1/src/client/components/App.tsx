@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { Helmet } from "react-helmet";
-import { ChunkCollectorContext, MfChunkLoader } from "../lib";
+import { ChunkCollectorContext, MfLoader } from "mf-chunk-collector";
+import { DeepNestedMF } from "./deepNestedMf";
 
-const Content = React.lazy(
+const AmazingForm = React.lazy(
   // @ts-ignore
-  () => import("app2/StringFormatter") as Promise<{ default: React.FC<any> }>
+  () => import("app2/AmazingForm") as Promise<{ default: React.FC<any> }>
 );
 
 const App = ({ collectChunk = () => {} }: any) => {
   const [state, setState] = React.useState<string>("");
-  const [isVisible, setIsVisible] = React.useState<boolean>(true);
 
   useEffect(() => {
     alert("hydrated app1");
@@ -44,25 +44,16 @@ const App = ({ collectChunk = () => {} }: any) => {
           />
         </div>
 
+        <DeepNestedMF content={state} />
         <div style={{ padding: "1rem" }}>
-          <button onClick={() => setIsVisible((value) => !value)}>
-            Toggle micro frontend
-          </button>
-        </div>
-
-        <div style={{ padding: "1rem" }}>
-          {isVisible && (
-            <React.Suspense fallback={<h1>Loading....</h1>}>
-              <MfChunkLoader
-                mf="app2"
-                type="federation"
-                context={ChunkCollectorContext}
-                name="StringFormatter"
-              >
-                <Content content={state} Context={ChunkCollectorContext} />
-              </MfChunkLoader>
-            </React.Suspense>
-          )}
+          {/* <React.Suspense fallback={<h1>Loading....</h1>}> */}
+          <MfLoader
+            mf="app2"
+            component={AmazingForm}
+            componentProps={{ content: state }}
+            name="AmazingForm"
+          />
+          {/* </React.Suspense> */}
         </div>
       </div>
     </ChunkCollectorContext.Provider>

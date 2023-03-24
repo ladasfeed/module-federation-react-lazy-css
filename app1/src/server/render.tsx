@@ -30,6 +30,7 @@ export default async (req, res, next) => {
     {
       async onAllReady() {
         const cssChunks = await chunkCollector.finish();
+        // const cssChunks = [];
 
         res.statusCode = didError ? 500 : 200;
         res.setHeader("Content-type", "text/html");
@@ -43,11 +44,12 @@ export default async (req, res, next) => {
         </head>
         <body><div id="root">`);
 
-        stream.pipe(writeable);
-        res.write(
-          `</div><script async data-chunk="main" src="http://localhost:3000/static/main.js"></script></body></html>`
-        );
-        res.end();
+        stream.pipe(writeable).on("finish", () => {
+          res.write(
+            `</div><script async data-chunk="main" src="http://localhost:3000/static/main.js"></script></body></html>`
+          );
+          res.end();
+        });
       },
       onShellError() {
         res.statusCode = 500;

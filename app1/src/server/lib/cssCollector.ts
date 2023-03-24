@@ -4,12 +4,21 @@ import {
   FederationStatsExposesType,
   StatsDataCacheType,
   RequiredRemotesType,
+  WebpackStatsStructureType,
 } from "./cssCollector.types";
 
 const REMOTES_MAP = {
   app2: "http://localhost:3001/static",
 };
 
+/**
+  Gets federationStats file structure
+  Transform it into usable shape >>
+  {
+    'Header': ['header.25wj213k12hk.css'],
+    'Footer': ['footer.g23dgs3fas1.css'],
+  }
+ */
 export const extractFederatedModuleCssFromStats = (federationStats) => {
   const exposesAsArray = Object.entries(
     federationStats.data.federatedModules[0]
@@ -32,6 +41,7 @@ export const extractFederatedModuleCssFromStats = (federationStats) => {
       const remoteComponentId = key.replace("./", "");
 
       chunksAcc[remoteComponentId] = extractCssChunksFromExposedModule(
+        // i do not have an idea why it is an array, like there could be several micro-frontend instances
         value[0]
       );
 
@@ -43,8 +53,16 @@ export const extractFederatedModuleCssFromStats = (federationStats) => {
   return federationChunksMap;
 };
 
+/**
+  Gets stats.json as param
+  Transform it into usable shape >>
+  {
+    'LazyLoadedChunk1': ['lazy1.25wj213k12hk.css'],
+    'LazyLoadedChunk2': ['lazy2.25wj213k12hk.css'],
+  }
+ */
 export const extractLazyChunksFromStats = (
-  stats: AxiosResponse<{ assetsByChunkName: { [key: string]: Array<string> } }>
+  stats: AxiosResponse<WebpackStatsStructureType>
 ) => {
   return Object.entries(stats.data.assetsByChunkName).reduce(
     (acc, [key, value]) => {
@@ -55,6 +73,10 @@ export const extractLazyChunksFromStats = (
   );
 };
 
+/**
+  Fetch federation-stats.json and stats.json
+  Transform them them into usable shape
+ */
 export const fetchRemoteStats = async (
   mf: string,
   statsDataCache: StatsDataCacheType
@@ -71,6 +93,10 @@ export const fetchRemoteStats = async (
   return;
 };
 
+/**
+  Fetch federation-stats.json and stats.json for every remote listed in the first argument
+  Save data to the second argument statsDataCache
+ */
 export const fetchStatsForRequiredRemotes = ({
   requiredRemotes,
   statsDataCache,
@@ -84,6 +110,12 @@ export const fetchStatsForRequiredRemotes = ({
   return Promise.all(promises);
 };
 
+/**
+  Gets all needed css chunks from statsDataCache 
+  using manually collected chunks from the JSX
+  @param statsDataCache cache to store data
+  @param mfChunks data about mfs and lazy loaded chunks
+ */
 export const getRequiredCssChunksByCollectedData = (
   statsDataCache: StatsDataCacheType,
   mfChunks: Array<CollectedChunkDataType>
@@ -107,6 +139,7 @@ export const initChunkCollector = () => {
   let collectedChunksData = [];
   let requiredRemotes = [];
   const statsDataCache: StatsDataCacheType = {};
+
   const collectChunk = (chunkData: CollectedChunkDataType) => {
     collectedChunksData.push(chunkData);
     if (chunkData.type == "federation") {
@@ -114,24 +147,29 @@ export const initChunkCollector = () => {
     }
   };
 
+  const finish = async () => {
+    try {
+      // load and store stats
+      await fetchStatsForRequiredRemotes({ requiredRemotes, statsDataCache });
+
+      // extract css from stats by collected chunks data
+      const cssChunks = getRequiredCssChunksByCollectedData(
+        statsDataCache,
+        collectedChunksData
+      );
+
+      // make a final string
+      return cssChunks
+        .map((chunk) => `<link rel="stylesheet" href="${chunk}">`)
+        .join("");
+    } catch (e) {
+      console.error(e, "Something went wrong with chunk collector...");
+      return "";
+    }
+  };
+
   return {
     collectChunk,
-    finish: async () => {
-      try {
-        await fetchStatsForRequiredRemotes({ requiredRemotes, statsDataCache });
-
-        const cssChunks = getRequiredCssChunksByCollectedData(
-          statsDataCache,
-          collectedChunksData
-        );
-
-        return cssChunks
-          .map((chunk) => `<link rel="stylesheet" href="${chunk}">`)
-          .join("");
-      } catch (e) {
-        console.error(e, "Something went wrong with chunk collector...");
-        return "";
-      }
-    },
+    finish,
   };
 };

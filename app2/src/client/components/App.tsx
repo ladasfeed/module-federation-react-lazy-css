@@ -4,14 +4,14 @@ import { Helmet } from "react-helmet";
 const StringFormatter = React.lazy(() => import("./exposed/StringFormatter"));
 
 const Context = createContext({
-  collectChunks: () => {},
+  collectChunk: () => {},
 });
 const App = () => {
   const [state, setState] = React.useState<string>("");
   const [isVisible, setIsVisible] = React.useState<boolean>(true);
 
   return (
-    <Context.Provider value={{ collectChunks: () => {} }}>
+    <Context.Provider value={{ collectChunk: () => {} }}>
       <div
         style={{
           padding: "1rem",
@@ -48,7 +48,7 @@ const App = () => {
         <div style={{ padding: "1rem" }}>
           {isVisible && (
             <React.Suspense fallback={<h1>Loading....</h1>}>
-              <StringFormatter content={state} Context={Context as any} />
+              <StringFormatter content={state} />
             </React.Suspense>
           )}
         </div>

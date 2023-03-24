@@ -1,24 +1,25 @@
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
-import { MfChunkLoader } from "../../lib";
 import { Card } from "../../modules/Card";
+// @ts-ignore
+import Image from "../../image.jpg";
 import "./index.css";
+
+import { exposedComponent } from "mf-chunk-collector";
+import { MfLazyChunkLoader } from "../../../mf.config";
 
 const UppercaseFormatter = React.lazy(
   () =>
     import(
-      /* webpackChunkName: "uppercase-formatter" */ "../../modules/UppercaseFormatter"
+      /* webpackChunkName: "UppercaseFormatter" */ "../../modules/UppercaseFormatter"
     )
 );
 
-console.log(UppercaseFormatter, "UppercaseFormatter");
-
 export interface PropsType {
   content?: string;
-  Context?: React.Context<any>;
 }
 
-const StringFormatter: React.FC<PropsType> = ({ Context, content = "" }) => {
+const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
   const data = useForm();
   const [state, setState] = useState(true);
 
@@ -37,21 +38,31 @@ const StringFormatter: React.FC<PropsType> = ({ Context, content = "" }) => {
         Load Uppercase formatter! Now it is {state ? "visible" : "not visible"}
       </button>
 
+      <br />
+      <br />
+      <div>
+        This is a background image
+        <div className="back"></div>
+      </div>
+      <div>
+        This is an image in tag <br />
+        <br />
+        <img
+          style={{ objectFit: "cover" }}
+          width={100}
+          height={100}
+          src={Image}
+        />
+      </div>
+
       <Card />
-      <React.Suspense fallback="loading">
-        {state && (
-          <MfChunkLoader
-            type="lazy"
-            mf={"app2"}
-            name="uppercase-formatter"
-            context={Context}
-          >
-            <UppercaseFormatter value={content} />
-          </MfChunkLoader>
-        )}
-      </React.Suspense>
+      {state && (
+        <MfLazyChunkLoader fallback="loading" chunkName="UppercaseFormatter">
+          <UppercaseFormatter value={content} />
+        </MfLazyChunkLoader>
+      )}
     </div>
   );
 };
 
-export default StringFormatter;
+export default exposedComponent(StringFormatter);

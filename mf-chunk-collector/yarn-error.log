@@ -1,0 +1,73 @@
+Arguments: 
+  /Users/sobolevdaniil/.nvm/versions/node/v14.15.0/bin/node /Users/sobolevdaniil/.nvm/versions/node/v14.15.0/bin/yarn
+
+PATH: 
+  /Users/sobolevdaniil/.nvm/versions/node/v14.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/sobolevdaniil/.nvm/versions/node/v14.15.0/bin:/opt/homebrew/bin:/opt/homebrew/sbin:/Users/sobolevdaniil/Library/Application Support/JetBrains/Toolbox/scripts:/Users/sobolevdaniil/Library/Application Support/JetBrains/Toolbox/scripts
+
+Yarn version: 
+  1.22.18
+
+Node version: 
+  14.15.0
+
+Platform: 
+  darwin x64
+
+Trace: 
+  SyntaxError: /Users/sobolevdaniil/Documents/mf/working-example/mf-chunk-collector/package.json: Unexpected token } in JSON at position 718
+      at JSON.parse (<anonymous>)
+      at /Users/sobolevdaniil/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:1625:59
+      at Generator.next (<anonymous>)
+      at step (/Users/sobolevdaniil/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:310:30)
+      at /Users/sobolevdaniil/.nvm/versions/node/v14.15.0/lib/node_modules/yarn/lib/cli.js:321:13
+
+npm manifest: 
+  {
+    "name": "mf-chunk-collector",
+    "version": "1.0.0",
+    "description": "",
+    "types": "./lib/cjs/types/index.d.ts",
+    "main": "./lib/cjs/index.js",
+    "files": [
+      "lib/**/*"
+    ],
+    "exports": {
+      ".": {
+        "import": {
+          "types": "./lib/esm/types/index.d.ts",
+          "default": "./lib/esm/index.mjs"
+        },
+        "require": {
+          "types": "./lib/cjs/types/index.d.ts",
+          "default": "./lib/cjs/index.js"
+        }
+      }
+    },
+    "scripts": {
+      "clean": "rm -rf ./lib",
+      "build": "npm run clean && npm run build:esm && npm run build:cjs",
+      "build:esm": "tsc -p ./configs/tsconfig.esm.json && mv lib/esm/index.js lib/esm/index.mjs",
+      "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
+    },
+    "devDependencies": {
+      "@types/mocha": "^9.1.1",
+      "mocha": "^10.0.0",
+      "ts-node": "^10.9.1",
+      "typescript": "^4.7.4",
+      "semantic-release": "^19.0.3",
+      "@types/chai": "^4.3.3",
+      "chai": "^4.3.6"
+    },
+    "peerDependencies": {
+      "react": "*", 
+      "react-dom": "*"
+    },
+    "author": "",
+    "license": "ISC"
+  }
+
+yarn manifest: 
+  No manifest
+
+Lockfile: 
+  No lockfile

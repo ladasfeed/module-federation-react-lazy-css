@@ -22,3 +22,7 @@ export type StatsDataCacheType = {
     };
   };
 };
+
+export type WebpackStatsStructureType = {
+  assetsByChunkName: { [key: string]: Array<string> };
+};
