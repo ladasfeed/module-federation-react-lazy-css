@@ -6,6 +6,7 @@
     "app2"
   ],
   "scripts": {
+    "linkAll": "cd mf-chunk-collector && yarn link && cd ../app1 && yarn link mf-chunk-collector && cd ../app2 && yarn link mf-chunk-collector",
     "start": "lerna run --parallel start",
     "serve": "lerna run --parallel serve",
     "build": "lerna run build"
