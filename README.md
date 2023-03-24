@@ -68,6 +68,8 @@ const stream = renderToPipeableStream(
 Host application is wrapped in ChunkCollectorContext. It is needed to spread access to server side chunkCollector for every component in the application.
 
 ```tsx
+import { ChunkCollectorContext } from "mf-chunk-collector";
+
 // we get collectChunk from the server side!
 const App = ({ collectChunk = () => {} }: any) => {
   return (
@@ -83,6 +85,8 @@ const App = ({ collectChunk = () => {} }: any) => {
 Let's connect a component from remote
 
 ```tsx
+import { MfLoader } from "mf-chunk-collector";
+
 const StringFormatter = React.lazy(() => import("app2/StringFormatter"));
 
 const App = ({ collectChunk = () => {} }: any) => {
@@ -122,8 +126,10 @@ Easy!
 Lets upgrade a component above and mount one internal lazy buddy.
 
 ```tsx
-// somewhere
-export const LazyLoadedWrapper = MFUtils.lazyWrapper("app2");
+// mf.config.ts
+import { MfLazyChunkLoaderFactory } from "mf-chunk-collector";
+
+export const MfLazyChunkLoader = MfLazyChunkLoaderFactory("app2");
 
 // StringFormatter.tsx
 const UppercaseFormatter = React.lazy(
@@ -136,14 +142,13 @@ const UppercaseFormatter = React.lazy(
 const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
   return (
     <div className="test">
-      <LazyLoadedWrapper
+      <MfLazyChunkLoader
         fallback="loading"
-        mf={"app2"}
         // name should match webpackChunkName, this is only dangerous place
         name="uppercase-formatter"
       >
         <UppercaseFormatter value={content} />
-      </LazyLoadedWrapper>
+      </MfLazyChunkLoader>
     </div>
   );
 };
@@ -151,4 +156,4 @@ const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
 export default exposedComponent(StringFormatter);
 ```
 
-You can easily connect inner lazy component for every level of nesting without any props drilling, everything is already connected (exposedComponent <--> LazyLoadedWrapper)
+You can easily connect inner lazy component for every level of nesting without any props drilling, everything is already connected inside the package (exposedComponent <--> LazyLoadedWrapper)
