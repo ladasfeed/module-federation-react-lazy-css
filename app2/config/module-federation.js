@@ -18,6 +18,10 @@ const shared = {
   "react-dom": {
     singleton: true,
   },
+  "react-hook-form": {
+    singleton: true,
+    eager: true,
+  },
 };
 
 module.exports = {
