@@ -19,10 +19,11 @@ export type MfLoaderPropsType<T extends React.FC> = {
     name: string;
     component: T;
     componentProps: Parameters<T>[0];
+    fallback?: React.ReactNode;
 };
 export declare const ChunkCollectorContext: React.Context<ContextType>;
 export declare const MfLazyChunkLoaderFactory: (mfName: string) => ({ chunkName, fallback, children }: MfChunkLoaderPropsType) => JSX.Element;
-export declare const MfLoader: <T extends React.FC<{}>>({ component, componentProps, mf, name, }: MfLoaderPropsType<T>) => React.FunctionComponentElement<{}>;
+export declare const MfLoader: <T extends React.FC<{}>>({ component, componentProps, mf, name, fallback, }: MfLoaderPropsType<T>) => JSX.Element;
 export declare const exposedComponent: <T extends React.FC<{}>>(component: T) => ({ contextValue, ...componentProps }: Parameters<T>[0] & {
     contextValue?: ContextType | undefined;
 }) => JSX.Element;

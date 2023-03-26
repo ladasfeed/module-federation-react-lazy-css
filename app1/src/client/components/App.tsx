@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import { Helmet } from "react-helmet";
 import { ChunkCollectorContext, MfLoader } from "mf-chunk-collector";
 import { DeepNestedMF } from "./deepNestedMf";
+import { HydrationIndicator } from "./HydratedIndicator";
 
 const AmazingForm = React.lazy(
   // @ts-ignore
@@ -10,10 +11,6 @@ const AmazingForm = React.lazy(
 
 const App = ({ collectChunk = () => {} }: any) => {
   const [state, setState] = React.useState<string>("");
-
-  useEffect(() => {
-    alert("hydrated app1");
-  }, []);
 
   return (
     <ChunkCollectorContext.Provider value={{ collectChunk }}>
@@ -24,14 +21,13 @@ const App = ({ collectChunk = () => {} }: any) => {
           border: "4px dashed #fc451e",
         }}
       >
+        <HydrationIndicator name="Host application" />
         <Helmet>
           <title>SSR MF Example</title>
         </Helmet>
 
         <div style={{ padding: "1rem" }}>
-          <h1>Module Federation Example: React 18 Code Splitting</h1>
-
-          <h2>This is the App 1 application.</h2>
+          <h1>Host application</h1>
         </div>
 
         <div style={{ padding: "1rem" }}>
@@ -40,7 +36,7 @@ const App = ({ collectChunk = () => {} }: any) => {
             type="text"
             value={state}
             onChange={(e) => setState(e.target.value)}
-            placeholder="Luke, I am your father..."
+            placeholder="..."
           />
         </div>
 

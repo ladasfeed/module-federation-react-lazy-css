@@ -17,7 +17,7 @@ export const MfLazyChunkLoaderFactory = (mfName) => ({ chunkName, fallback, chil
     }
     return React.createElement(React.Suspense, { fallback: fallback }, children);
 };
-export const MfLoader = ({ component, componentProps, mf, name, }) => {
+export const MfLoader = ({ component, componentProps, mf, name, fallback, }) => {
     const context = useContext(ChunkCollectorContext);
     if (typeof window === "undefined") {
         context.collectChunk({
@@ -26,10 +26,10 @@ export const MfLoader = ({ component, componentProps, mf, name, }) => {
             mf,
         });
     }
-    return React.createElement(component, {
+    return (React.createElement(React.Suspense, { fallback: fallback }, React.createElement(component, {
         ...componentProps,
         contextValue: context,
-    });
+    })));
 };
 export const exposedComponent = (component) => ({ contextValue, ...componentProps }) => {
     return (React.createElement(ChunkCollectorContext.Provider, { value: contextValue || defaultContextValue }, React.createElement(component, componentProps)));

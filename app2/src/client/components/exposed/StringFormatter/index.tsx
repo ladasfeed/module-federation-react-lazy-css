@@ -3,10 +3,11 @@ import { useForm } from "react-hook-form";
 import { Card } from "../../modules/Card";
 // @ts-ignore
 import Image from "../../image.jpg";
-import "./index.css";
+import s from "./index.scss";
 
 import { exposedComponent } from "mf-chunk-collector";
 import { MfLazyChunkLoader } from "../../../mf.config";
+import { HydrationIndicator } from "../../HydratedIndicator";
 
 const UppercaseFormatter = React.lazy(
   () =>
@@ -23,14 +24,10 @@ const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
   const data = useForm();
   const [state, setState] = useState(true);
 
-  React.useEffect(() => {
-    alert("StringFormatter hydrated successfully");
-  }, []);
-
   return (
-    <div className="test">
-      <h2>Remote application</h2>
-      <p>This component from remote application.</p>
+    <div className={s.container}>
+      <h2>StringFormatter</h2>
+      <HydrationIndicator name="StringFormatter" />
       <p>
         Censored content: <strong>{content.replace("fuck", "")}</strong>
       </p>
@@ -42,7 +39,7 @@ const StringFormatter: React.FC<PropsType> = ({ content = "" }) => {
       <br />
       <div>
         This is a background image
-        <div className="back"></div>
+        <div className={s.back}></div>
       </div>
       <div>
         This is an image in tag <br />

@@ -4,11 +4,7 @@ import { renderToPipeableStream } from "react-dom/server";
 
 import App from "../client/components/App";
 import { Writable } from "stream";
-import {
-  fetchAllStats,
-  getRequiredCssChunksByCollectedData,
-  initChunkCollector,
-} from "./lib/cssCollector";
+import { initChunkCollector } from "./lib/cssCollector";
 
 export default async (req, res, next) => {
   const helmet = Helmet.renderStatic();
