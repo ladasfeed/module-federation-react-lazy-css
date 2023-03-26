@@ -9,6 +9,11 @@ Run `yarn start` this will build and start all applications.
 - [localhost:3000](http://localhost:3000/) (app1)
 - [localhost:3001](http://localhost:3001/) (app2)
 
+## Visualization 
+![image](https://user-images.githubusercontent.com/57018343/227779550-a0414513-5e26-44a5-8c0f-0177f2e20fbf.png)
+
+
+
 ## HOST SERVER SIDE
 
 Server side should be modified. Briefly:
