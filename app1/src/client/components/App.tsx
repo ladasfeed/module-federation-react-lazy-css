@@ -11,6 +11,7 @@ const AmazingForm = React.lazy(
 
 const App = ({ collectChunk = () => {} }: any) => {
   const [state, setState] = React.useState<string>("");
+  const [isVisible, setIsVisible] = React.useState(false);
 
   return (
     <ChunkCollectorContext.Provider value={{ collectChunk }}>
@@ -21,14 +22,14 @@ const App = ({ collectChunk = () => {} }: any) => {
           border: "4px dashed #fc451e",
         }}
       >
-        <HydrationIndicator name="Host application" />
         <Helmet>
           <title>SSR MF Example</title>
         </Helmet>
 
-        <div style={{ padding: "1rem" }}>
+        <div>
           <h1>Host application</h1>
         </div>
+        <HydrationIndicator name="Host application" />
 
         <div style={{ padding: "1rem" }}>
           <h3>Type something into this input</h3>
@@ -41,15 +42,20 @@ const App = ({ collectChunk = () => {} }: any) => {
         </div>
 
         <DeepNestedMF content={state} />
+        <button onClick={() => setIsVisible(!isVisible)}>
+          Toggle visibility
+        </button>
         <div style={{ padding: "1rem" }}>
-          {/* <React.Suspense fallback={<h1>Loading....</h1>}> */}
-          <MfLoader
-            mf="app2"
-            component={AmazingForm}
-            componentProps={{ content: state }}
-            name="AmazingForm"
-          />
-          {/* </React.Suspense> */}
+          {isVisible && (
+            <MfLoader
+              // @ts-ignore
+              fallback="Loading"
+              mf="app2"
+              component={AmazingForm}
+              componentProps={{ content: state }}
+              name="AmazingForm"
+            />
+          )}
         </div>
       </div>
     </ChunkCollectorContext.Provider>
