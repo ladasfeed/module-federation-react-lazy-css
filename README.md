@@ -3,7 +3,9 @@
 ## Running
 
 Run `yarn` to install the dependencies.
+
 Run `yarn run linkAll` to link local package.
+
 Run `yarn start` this will build and start all applications.
 
 - [localhost:3000](http://localhost:3000/) (app1)
